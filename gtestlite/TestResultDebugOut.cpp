@@ -1,4 +1,3 @@
-/*
 #include "TestResultDebugOut.h"
 #include "Failure.h"
 #include <iostream>
@@ -40,4 +39,3 @@ void TestResultDebugOut::endTests ()
 	printf("%s \n\n",oss.str().c_str());
     //OutputDebugString("\n");
 }
-			   */

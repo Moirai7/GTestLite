@@ -28,7 +28,7 @@ bool CheckClose(Expected const expected, Actual const actual, Tolerance const to
 /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// 
 
 template< typename Expected, typename Actual >
-bool CheckEqual( Expected const expected, Actual const actual, std::string & errorMsg) {
+bool CheckEqual( Expected const expected,  Actual const actual, std::string & errorMsg) {
     if ( expected != actual) {  
             std::ostringstream oss;
             oss << "Expected " << expected << " but was " << actual;
@@ -42,7 +42,6 @@ bool CheckEqual( Expected const expected, Actual const actual, std::string & err
 		return true;
 	}
 }
-
 bool CheckEqual(char const* expected, char const* actual, std::string & errorMsg);
 bool CheckEqual(char* expected, char* actual, std::string & errorMsg);
 bool CheckEqual(char* expected, char const* actual, std::string & errorMsg);

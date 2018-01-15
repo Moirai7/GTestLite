@@ -3,13 +3,16 @@
 #include <iostream>
 #include <sstream>
  
+TestResultStdErr::TestResultStdErr(bool d){
+   debug = d;
+}
 
 void TestResultStdErr::addFailure (const Failure & failure) 
 {
     std::ostringstream oss;
     oss << failure;
     TestResult::addFailure(failure);
-	printf("%s \n",oss.str().c_str());
+    printf("%s \n",oss.str().c_str());
 }
 
 void TestResultStdErr::endTests () 

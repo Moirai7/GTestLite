@@ -3,9 +3,10 @@
 #include "Failure.h"
 
 
-TestResult::TestResult() : count_failure_testcase_total(0),count_failure_total(0), count_failure_testcase_in_suite (0), count_failure_in_testcase(0), count_testcase_total(0), secondsElapsed(0),count_testcase_in_suite(0)
+TestResult::TestResult(bool d) : count_failure_testcase_total(0),count_failure_total(0), count_failure_testcase_in_suite (0), count_failure_in_testcase(0), count_testcase_total(0), secondsElapsed(0),count_testcase_in_suite(0),debug(0)
 {
     ::time(&startTime);
+    debug = d;
 }
 
 void TestResult::getTotalTestCases(){

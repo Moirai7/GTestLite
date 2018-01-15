@@ -21,7 +21,6 @@ void Test::run (TestResult& result)
     {
 #endif
         setup();
-		//printf("I am HHHH\n");
 	    runTest (result);
 #ifndef DONT_CATCH_EXCEPTIONS
     }

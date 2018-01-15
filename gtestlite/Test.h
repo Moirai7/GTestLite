@@ -99,20 +99,23 @@ protected:
     try { \
 		if (!(condition)) \
 		result_.addFailure (Failure ( #condition " is incorrect" , name, FILE_S, __LINE__,##__VA_ARGS__)); \
-		else {\
+		else if (result_.debug){\
 		printf("%s (%s line:%d)\n","Pass: "#__VA_ARGS__,FILE_S,__LINE__);\
 		}\
     } catch(...) { \
-	result_.addFailure (Failure ("Unhandled exception in CHECK " #condition , name, FILE_S, __LINE__,##__VA_ARGS__)); \
+		result_.addFailure (Failure ("Unhandled exception in CHECK " #condition , name, FILE_S, __LINE__,##__VA_ARGS__)); \
     }
 
 #define CHECK_EQUAL(expected, actual,...) \
      try { \
 	       std::string errorMsg;\
-           if (CheckEqual(expected, actual,errorMsg)==false){ \
+               if (expected != actual){\
+                        std::ostringstream oss;\
+                        oss << "Expected " << expected << " but was " << actual;\
+                        errorMsg = oss.str();\
 			   result_.addFailure (Failure (errorMsg, name, FILE_S, __LINE__,##__VA_ARGS__));\
             }\
-		else {\
+		else if (result_.debug){\
 		    printf("%s (%s line:%d) \n","Pass:\t"#__VA_ARGS__,FILE_S,__LINE__);\
 		}\
     } catch(...) { \
@@ -127,6 +130,7 @@ protected:
             result_.addFailure (Failure (errorMsg, name, FILE_S, __LINE__,##__VA_ARGS__));\
 		} \
 		else {\
+	if (result_.debug)\
 		    printf("%s (%s line:%d) \n","Pass:\t"#__VA_ARGS__,FILE_S,__LINE__);\
 		}\
     } \
@@ -146,6 +150,7 @@ protected:
 			result_.addFailure (Failure (message, name, FILE_S, __LINE__,##__VA_ARGS__));\
         }\
 		else {\
+	if (result_.debug)\
 		    printf("%s (%s line:%d) \n","Pass:\t"#__VA_ARGS__,FILE_S,__LINE__);\
 		}\
     } catch(...) { \
@@ -165,6 +170,7 @@ protected:
 			result_.addFailure (Failure (message, name, FILE_S, __LINE__,##__VA_ARGS__));\
         }\
 		else {\
+	if (result_.debug)\
 		    printf("%s (%s line:%d) \n","Pass:\t"#__VA_ARGS__,FILE_S,__LINE__);\
 		}\
     } catch(...) { \
@@ -186,6 +192,7 @@ protected:
 				 result_.addFailure (Failure (message, name, FILE_S, __LINE__,##__VA_ARGS__));\
         }\
 		else {\
+	if (result_.debug)\
 		    printf("%s (%s line:%d) \n","Pass:\t"#__VA_ARGS__,FILE_S,__LINE__);\
 		}\
     } catch(...) { \
@@ -205,6 +212,7 @@ protected:
 							  result_.addFailure (Failure (msg.c_str(), name, FILE_S, __LINE__,##__VA_ARGS__));\
         }\
 		else {\
+	if (result_.debug)\
 		    printf("%s (%s line:%d) \n","Pass:\t"#__VA_ARGS__,FILE_S,__LINE__);\
 		}\
     } catch(...) { \
@@ -220,6 +228,7 @@ protected:
 			      result_.addFailure (Failure (errorMsg, name, FILE_S, __LINE__,##__VA_ARGS__));\
              }\
 		     else {\
+	if (result_.debug)\
 		        printf("%s (%s line:%d) \n","Pass:\t"#__VA_ARGS__,FILE_S,__LINE__);\
 		      }\
         } \
@@ -243,6 +252,7 @@ protected:
 			result_.addFailure (Failure ("Expected exception: \"" #ExpectedExceptionType "\" not thrown", name, FILE_S, __LINE__,##__VA_ARGS__));\
 		}\
 		else {\
+	if (result_.debug)\
 		    printf("%s (%s line:%d) \n","Pass:\t"#__VA_ARGS__,FILE_S,__LINE__);\
 		}\
     } while(0)
@@ -254,7 +264,10 @@ protected:
 
 #define CHECK(condition) \
 	if (!(condition)) \
-		result_.addFailure (Failure (#condition, name, __FILE__, __LINE__));
+		result_.addFailure (Failure (#condition, name, __FILE__, __LINE__));\
+		else if (result_.debug){\
+		    printf("%s (%s line:%d) \n","Pass:\t"#__VA_ARGS__,FILE_S,__LINE__);\
+		}
 
 #define CHECK_LONGS_EQUAL(expected,actual)\
 {\
@@ -265,6 +278,8 @@ protected:
 		sprintf (message, "expected %ld but was: %ld", _expected, _actual);\
 		result_.addFailure (Failure (message, name, __FILE__, __LINE__));\
 	}\
+		else if (result_.debug)\
+		    printf("%s (%s line:%d) \n","Pass:\t"#__VA_ARGS__,FILE_S,__LINE__);\
 }
 
 
@@ -277,6 +292,8 @@ protected:
 		sprintf (message, "expected %lf but was: %lf", (_expected), (_actual));\
 		result_.addFailure (Failure (message, name, __FILE__, __LINE__));\
 	}\
+		else if (result_.debug)\
+		    printf("%s (%s line:%d) \n","Pass:\t"#__VA_ARGS__,FILE_S,__LINE__);\
 }
 
 
@@ -291,6 +308,8 @@ protected:
                 _actual.x, _actual.y, _actual.z); \
         result_.addFailure (Failure (message, name, __FILE__, __LINE__));\
     }\
+		else if (result_.debug)\
+		    printf("%s (%s line:%d) \n","Pass:\t"#__VA_ARGS__,FILE_S,__LINE__);\
 }
 
 
@@ -303,6 +322,8 @@ protected:
                             std::string("' but was: '") + _actual + "'"; \
         result_.addFailure (Failure (msg.c_str(), name, __FILE__, __LINE__));\
     }\
+		else if (result_.debug)\
+		    printf("%s (%s line:%d) \n","Pass:\t"#__VA_ARGS__,FILE_S,__LINE__);\
 }
 
 

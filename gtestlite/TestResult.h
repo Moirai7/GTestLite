@@ -11,7 +11,7 @@ class Failure;
 class TestResult
 {
 public:
-    TestResult ();
+    TestResult (bool debug=false);
     virtual ~TestResult() {};
 
 	virtual void testWasRun ();
@@ -21,6 +21,7 @@ public:
 
 	void getTotalTestCases();
     //int getFailureCount() const { return failureCount; }
+        bool debug;
 
 protected:
 	//int failureCount;

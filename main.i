@@ -5,8 +5,6 @@
 # 1 "<command line>" 1
 # 1 "<built-in>" 2
 # 1 "main.cpp" 2
-
-
 # 1 "./gtestlite/TestHarness.h" 1
 
 
@@ -41821,7 +41819,7 @@ class Failure;
 class TestResult
 {
 public:
-    TestResult ();
+    TestResult (bool debug=false);
     virtual ~TestResult() {};
 
  virtual void testWasRun ();
@@ -41831,6 +41829,7 @@ public:
 
  void getTotalTestCases();
 
+        bool debug;
 
 protected:
 
@@ -41889,7 +41888,6 @@ bool CheckEqual( Expected const expected, Actual const actual, std::string & err
   return true;
  }
 }
-
 bool CheckEqual(char const* expected, char const* actual, std::string & errorMsg);
 bool CheckEqual(char* expected, char* actual, std::string & errorMsg);
 bool CheckEqual(char* expected, char const* actual, std::string & errorMsg);
@@ -42010,7 +42008,7 @@ private:
 
 };
 # 8 "./gtestlite/TestHarness.h" 2
-# 4 "main.cpp" 2
+# 2 "main.cpp" 2
 # 1 "./gtestlite/TestResultStdErr.h" 1
 
 
@@ -42021,32 +42019,186 @@ private:
 class TestResultStdErr : public TestResult
 {
 public:
+    TestResultStdErr(bool d=false);
     virtual void addFailure (const Failure & failure);
     virtual void endTests ();
 };
-# 5 "main.cpp" 2
-# 1 "./MyTestClass.h" 1
+# 3 "main.cpp" 2
 
+# 1 "./gtestlite/Queue.cpp" 1
 
-
-
-class MyTestClass
+using namespace std;
+template <class T>
+class Queue
 {
-public:
-    MyTestClass();
-    ~MyTestClass();
-
- void UseBadPointer() const;
-    void DivideByZero() const;
-    void ThrowException() const;
-
-
-    static int s_currentInstances;
-    static int s_instancesCreated;
-    static int s_maxSimultaneousInstances;
+public :
+ Queue();
+ ~Queue();
+ int size();
+ bool isEmpty();
+ void clear();
+ void enqueue(T value);
+ T dequeue();
+ T peek();
+ void expandCapacity();
+private :
+ static const int INITIAL_CAPACITY = 10;
+ T *data;
+ int capacity;
+ int head;
+ int tail;
 };
-# 6 "main.cpp" 2
 
+template <class T>
+Queue<T> :: Queue()
+{
+ capacity = INITIAL_CAPACITY;
+ data = new T[capacity];
+ head = tail = 0;
+
+}
+
+template <class T>
+Queue<T> :: ~Queue()
+{
+ delete [] data;
+}
+
+template <class T>
+int Queue<T> :: size()
+{
+ return (tail + capacity - head) % capacity;
+}
+
+template <class T>
+bool Queue<T> :: isEmpty()
+{
+ return head == tail;
+}
+
+template <class T>
+void Queue<T> :: clear()
+{
+ head = tail = 0;
+}
+
+template <class T>
+void Queue<T> :: enqueue(T value)
+{
+ if (size() == capacity - 1) expandCapacity();
+ data[tail] = value;
+ tail = (tail + 1) % capacity;
+}
+
+template <class T>
+T Queue<T> :: dequeue()
+{
+ if (isEmpty()) cerr << "dequeue: Attempting to dequeue an empty queue";
+ T result = data[head];
+ head = (head + 1) % capacity;
+ return result;
+}
+
+template <class T>
+T Queue<T> :: peek()
+{
+ if (isEmpty()) cerr << "peek: Attempting to peek at an empty queue";
+ return data[head];
+}
+
+template <class T>
+void Queue<T> :: expandCapacity() {
+ int count = size();
+ capacity *= 2;
+ T *oldArray = data;
+ data = new T[capacity];
+ for (int i = 0; i < count; i++) {
+  data[i] = oldArray[(head + i) % capacity];
+ }
+ head = 0;
+ tail = count;
+ delete [] oldArray;
+}
+# 5 "main.cpp" 2
+
+
+using namespace std;
+class onearray_testTest : public Test { public: onearray_testTest () : Test ("array_test" "_Test","array_test","one" ) {} void setup() {}; void teardown() {}; void runTest (TestResult& result_); } onearray_testInstance; void onearray_testTest::runTest (TestResult& result_) {
+        const float oned[2] = { 110, 20 };
+        const float one[3] = { 10,20, 20 };
+    { try { std::string errorMsg; if ( CheckArrayEqual( one, oned, 2,errorMsg )==false){ result_.addFailure (Failure (errorMsg, name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 11,"hello")); } else { if (result_.debug) printf("%s (%s line:%d) \n","Pass:\t""\"hello\"",(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),11); } } catch (...) { result_.addFailure (Failure ("Unhandled exception", name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 11,"hello")); } };
+
+}
+
+class twoarray_testTest : public Test { public: twoarray_testTest () : Test ("array_test" "_Test","array_test","two" ) {} void setup() {}; void teardown() {}; void runTest (TestResult& result_); } twoarray_testInstance; void twoarray_testTest::runTest (TestResult& result_) {
+        const float oned[2] = { 10, 20 };
+        const float one[3] = { 10,20, 20 };
+    { try { std::string errorMsg; if ( CheckArrayEqual( one, oned, 2,errorMsg )==false){ result_.addFailure (Failure (errorMsg, name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 18,"2")); } else { if (result_.debug) printf("%s (%s line:%d) \n","Pass:\t""\"2\"",(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),18); } } catch (...) { result_.addFailure (Failure ("Unhandled exception", name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 18,"2")); } };
+
+}
+
+
+class threearray_testTest : public Test { public: threearray_testTest () : Test ("array_test" "_Test","array_test","three" ) {} void setup() {}; void teardown() {}; void runTest (TestResult& result_); } threearray_testInstance; void threearray_testTest::runTest (TestResult& result_) {
+        const float oned[2] = { 10, 20 };
+        const float one[3] = { 10,20, 20 };
+    { try { std::string errorMsg; if ( CheckArrayEqual( one, oned, 3,errorMsg )==false){ result_.addFailure (Failure (errorMsg, name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 26,"3")); } else { if (result_.debug) printf("%s (%s line:%d) \n","Pass:\t""\"3\"",(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),26); } } catch (...) { result_.addFailure (Failure ("Unhandled exception", name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 26,"3")); } };
+
+}
+
+class MyTest2CHECK_CLOSETest : public Test { public: MyTest2CHECK_CLOSETest () : Test ("CHECK_CLOSE" "_Test","CHECK_CLOSE","MyTest2" ) {} void setup() {}; void teardown() {}; void runTest (TestResult& result_); } MyTest2CHECK_CLOSEInstance; void MyTest2CHECK_CLOSETest::runTest (TestResult& result_)
+{
+
+    try { std::string errorMsg; if ( CheckClose(1, 13,3,errorMsg)==false ){ result_.addFailure (Failure (errorMsg, name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 33,"12.2,13,1")); } else { if (result_.debug) printf("%s (%s line:%d) \n","Pass:\t""\"12.2,13,1\"",(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),33); } } catch (...) { result_.addFailure (Failure ("Unhandled exception in CHECK_CLOSE ",name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 33,"12.2,13,1")); };
+}
+
+class MyTest1CHECK_CLOSETest : public Test { public: MyTest1CHECK_CLOSETest () : Test ("CHECK_CLOSE" "_Test","CHECK_CLOSE","MyTest1" ) {} void setup() {}; void teardown() {}; void runTest (TestResult& result_); } MyTest1CHECK_CLOSEInstance; void MyTest1CHECK_CLOSETest::runTest (TestResult& result_)
+{
+    float fnum = 1.0000f;
+    try { std::string errorMsg; if ( CheckClose(12.2, 13,1,errorMsg)==false ){ result_.addFailure (Failure (errorMsg, name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 39,"12.2,13,1")); } else { if (result_.debug) printf("%s (%s line:%d) \n","Pass:\t""\"12.2,13,1\"",(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),39); } } catch (...) { result_.addFailure (Failure ("Unhandled exception in CHECK_CLOSE ",name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 39,"12.2,13,1")); };
+}
+
+namespace check{
+
+        float fnum = 1.1;
+        class MyTest1CHECKTest : public Test { public: MyTest1CHECKTest () : Test ("CHECK" "_Test","CHECK","MyTest1" ) {} void setup() {}; void teardown() {}; void runTest (TestResult& result_); } MyTest1CHECKInstance; void MyTest1CHECKTest::runTest (TestResult& result_)
+        {
+
+                try { if (!(fnum!=22)) result_.addFailure (Failure ( "fnum!=22" " is incorrect" , name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 48)); else if (result_.debug){ printf("%s (%s line:%d)\n","Pass: """,(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),48); } } catch(...) { result_.addFailure (Failure ("Unhandled exception in CHECK " "fnum!=22" , name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 48)); };
+        }
+
+        class MyTest3CHECKTest : public Test { public: MyTest3CHECKTest () : Test ("CHECK" "_Test","CHECK","MyTest3" ) {} void setup() {}; void teardown() {}; void runTest (TestResult& result_); } MyTest3CHECKInstance; void MyTest3CHECKTest::runTest (TestResult& result_)
+        {
+                float fnum = 1.0000f;
+                try { if (!((fnum==0x10))) result_.addFailure (Failure ( "(fnum==0x10)" " is incorrect" , name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 54)); else if (result_.debug){ printf("%s (%s line:%d)\n","Pass: """,(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),54); } } catch(...) { result_.addFailure (Failure ("Unhandled exception in CHECK " "(fnum==0x10)" , name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 54)); };
+        }
+
+        class MyTest4CHECKTest : public Test { public: MyTest4CHECKTest () : Test ("CHECK" "_Test","CHECK","MyTest4" ) {} void setup() {}; void teardown() {}; void runTest (TestResult& result_); } MyTest4CHECKInstance; void MyTest4CHECKTest::runTest (TestResult& result_)
+        {
+                printf("fnum=    %f\n",fnum);
+                try { if (!(fnum==1.1f)) result_.addFailure (Failure ( "fnum==1.1f" " is incorrect" , name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 60,"fnum==1.1")); else if (result_.debug){ printf("%s (%s line:%d)\n","Pass: ""\"fnum==1.1\"",(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),60); } } catch(...) { result_.addFailure (Failure ("Unhandled exception in CHECK " "fnum==1.1f" , name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 60,"fnum==1.1")); };
+        }
+
+        class MyTest5CHECKTest : public Test { public: MyTest5CHECKTest () : Test ("CHECK" "_Test","CHECK","MyTest5" ) {} void setup() {}; void teardown() {}; void runTest (TestResult& result_); } MyTest5CHECKInstance; void MyTest5CHECKTest::runTest (TestResult& result_)
+        {
+                float fnum = 1.0000f;
+                try { if (!(("abcd"=="abc"))) result_.addFailure (Failure ( "(\"abcd\"==\"abc\")" " is incorrect" , name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 66,"abcd==abc")); else if (result_.debug){ printf("%s (%s line:%d)\n","Pass: ""\"abcd==abc\"",(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),66); } } catch(...) { result_.addFailure (Failure ("Unhandled exception in CHECK " "(\"abcd\"==\"abc\")" , name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 66,"abcd==abc")); };
+        }
+}
+
+namespace first{
+        float fnum = 2.0000f;
+
+        class MyTest1DoubleTest : public Test { public: MyTest1DoubleTest () : Test ("Double" "_Test","Double","MyTest1" ) {} void setup() {}; void teardown() {}; void runTest (TestResult& result_); } MyTest1DoubleInstance; void MyTest1DoubleTest::runTest (TestResult& result_){
+                { try { double _expected = (fnum); double _actual = (2.0f); if (fabs ((_expected)-(_actual)) > 0.001) { char message [80]; sprintf (message, "expected %lf but was: %lf", (_expected), (_actual)); result_.addFailure (Failure (message, name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 74)); } else { if (result_.debug) printf("%s (%s line:%d) \n","Pass:\t""",(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),74); } } catch(...) { result_.addFailure (Failure ("Unhandled exception", name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 74)); }};
+        }
+        class MyTest2DoubleTest : public Test { public: MyTest2DoubleTest () : Test ("Double" "_Test","Double","MyTest2" ) {} void setup() {}; void teardown() {}; void runTest (TestResult& result_); } MyTest2DoubleInstance; void MyTest2DoubleTest::runTest (TestResult& result_){
+                float fnum = 1.1000f;
+                { try { double _expected = (fnum); double _actual = (1.0222f); if (fabs ((_expected)-(_actual)) > 0.001) { char message [80]; sprintf (message, "expected %lf but was: %lf", (_expected), (_actual)); result_.addFailure (Failure (message, name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 78)); } else { if (result_.debug) printf("%s (%s line:%d) \n","Pass:\t""",(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),78); } } catch(...) { result_.addFailure (Failure ("Unhandled exception", name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 78)); }};
+        }
+        class MyTest5DoubleTest : public Test { public: MyTest5DoubleTest () : Test ("Double" "_Test","Double","MyTest5" ) {} void setup() {}; void teardown() {}; void runTest (TestResult& result_); } MyTest5DoubleInstance; void MyTest5DoubleTest::runTest (TestResult& result_){
+                { try { double _expected = (fnum); double _actual = (2.0f); if (fabs ((_expected)-(_actual)) > 0.001) { char message [80]; sprintf (message, "expected %lf but was: %lf", (_expected), (_actual)); result_.addFailure (Failure (message, name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 81)); } else { if (result_.debug) printf("%s (%s line:%d) \n","Pass:\t""",(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),81); } } catch(...) { result_.addFailure (Failure ("Unhandled exception", name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 81)); }};
+        }
+}
 
 int foo(int a){
 
@@ -42055,16 +42207,41 @@ return a+2;
 
 class AAAAAATest : public Test { public: AAAAAATest () : Test ("AAA" "_Test","AAA","AAA" ) {} void setup() {}; void teardown() {}; void runTest (TestResult& result_); } AAAAAAInstance; void AAAAAATest::runTest (TestResult& result_)
 {
-    try { if (!(3==foo(1))) result_.addFailure (Failure ( "3==foo(1)" " is incorrect" , name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 15,"3==foo(1)")); else { printf("%s (%s line:%d)\n","Pass: ""\"3==foo(1)\"",(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),15); } } catch(...) { result_.addFailure (Failure ("Unhandled exception in CHECK " "3==foo(1)" , name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 15,"3==foo(1)")); };
+    try { if (!(3==foo(1))) result_.addFailure (Failure ( "3==foo(1)" " is incorrect" , name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 92,"3==foo(1)")); else if (result_.debug){ printf("%s (%s line:%d)\n","Pass: ""\"3==foo(1)\"",(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),92); } } catch(...) { result_.addFailure (Failure ("Unhandled exception in CHECK " "3==foo(1)" , name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 92,"3==foo(1)")); };
+}
+
+class MyTest1CHECK_STRINGS_EQUALTest : public Test { public: MyTest1CHECK_STRINGS_EQUALTest () : Test ("CHECK_STRINGS_EQUAL" "_Test","CHECK_STRINGS_EQUAL","MyTest1" ) {} void setup() {}; void teardown() {}; void runTest (TestResult& result_); } MyTest1CHECK_STRINGS_EQUALInstance; void MyTest1CHECK_STRINGS_EQUALTest::runTest (TestResult& result_)
+{
+    { try { std::string _expected((char const*)"SCEA"); std::string _actual("USA"); if (_expected != _actual) { std::string msg = std::string("expected '") + _expected + std::string("' but was: '") + _actual + "'"; result_.addFailure (Failure (msg.c_str(), name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 97,"USA==USA")); } else { if (result_.debug) printf("%s (%s line:%d) \n","Pass:\t""\"USA==USA\"",(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),97); } } catch(...) { result_.addFailure (Failure ("Unhandled exception", name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 97,"USA==USA")); }};
+}
+class MyTest2CHECK_STRINGS_EQUALTest : public Test { public: MyTest2CHECK_STRINGS_EQUALTest () : Test ("CHECK_STRINGS_EQUAL" "_Test","CHECK_STRINGS_EQUAL","MyTest2" ) {} void setup() {}; void teardown() {}; void runTest (TestResult& result_); } MyTest2CHECK_STRINGS_EQUALInstance; void MyTest2CHECK_STRINGS_EQUALTest::runTest (TestResult& result_)
+{
+    char const* ref="scea";
+    char const* tar="SCEA";
+    { try { std::string _expected(ref); std::string _actual(tar); if (_expected != _actual) { std::string msg = std::string("expected '") + _expected + std::string("' but was: '") + _actual + "'"; result_.addFailure (Failure (msg.c_str(), name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 103)); } else { if (result_.debug) printf("%s (%s line:%d) \n","Pass:\t""",(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),103); } } catch(...) { result_.addFailure (Failure ("Unhandled exception", name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 103)); }};
+}
+
+class MyTest3CHECK_STRINGS_EQUALTest : public Test { public: MyTest3CHECK_STRINGS_EQUALTest () : Test ("CHECK_STRINGS_EQUAL" "_Test","CHECK_STRINGS_EQUAL","MyTest3" ) {} void setup() {}; void teardown() {}; void runTest (TestResult& result_); } MyTest3CHECK_STRINGS_EQUALInstance; void MyTest3CHECK_STRINGS_EQUALTest::runTest (TestResult& result_)
+{
+    char const* tar="SCEA";
+    try { std::string errorMsg; if (CheckEqual(tar, "SCEA",errorMsg)==false){ result_.addFailure (Failure (errorMsg, name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 109)); } else if (result_.debug){ printf("%s (%s line:%d) \n","Pass:\t""",(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),109); } } catch(...) { result_.addFailure (Failure ("Unhandled exception", name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 109)); };
 }
 
 
+class fourcheck_eqTest : public Test { public: fourcheck_eqTest () : Test ("check_eq" "_Test","check_eq","four" ) {} void setup() {}; void teardown() {}; void runTest (TestResult& result_); } fourcheck_eqInstance; void fourcheck_eqTest::runTest (TestResult& result_) {
+       char const* tar="SCEA";
+    try { std::string errorMsg; if (CheckEqual(std::string("SCEA"), tar,errorMsg)==false){ result_.addFailure (Failure (errorMsg, name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 115,"scea=SCEA??")); } else if (result_.debug){ printf("%s (%s line:%d) \n","Pass:\t""\"scea=SCEA??\"",(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),115); } } catch(...) { result_.addFailure (Failure ("Unhandled exception", name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 115,"scea=SCEA??")); };
+}
+
 class MyFixtureSetup : public TestSetup
 {
+
 public:
     void setup()
     {
-
+ list.enqueue(1);
+ list.enqueue(2);
+ list.dequeue();
         someValue = 2.0;
         str = "Hello";
     }
@@ -42075,58 +42252,55 @@ public:
     }
 
 protected:
+    Queue<int> list;
     float someValue;
     std::string str;
-
+    const float oned[2]={110,20};
+    const float one[3]={10,11,12};
+    bool check = true;
+    long long num = 12345678998;
 };
-
 
 
 class Test1MyFixtureTest : public Test, MyFixtureSetup { public: Test1MyFixtureTest () : Test ("MyFixture" "_Test","MyFixture","Test1" ) {} void setup() {MyFixtureSetup::setup();} void teardown() {MyFixtureSetup::teardown();} void runTest (TestResult& result_); } Test1MyFixtureInstance; void Test1MyFixtureTest::runTest (TestResult& result_)
 {
-    { try { double _expected = (someValue); double _actual = (2.0f); if (fabs ((_expected)-(_actual)) > 0.001) { char message [80]; sprintf (message, "expected %lf but was: %lf", (_expected), (_actual)); result_.addFailure (Failure (message, name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 44,"2.0=2.0")); } else { printf("%s (%s line:%d) \n","Pass:\t""\"2.0=2.0\"",(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),44); } } catch(...) { result_.addFailure (Failure ("Unhandled exception", name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 44,"2.0=2.0")); }};
-    someValue = 0;
-
-
-
-
-
-
+    try { if (!(someValue<=22)) result_.addFailure (Failure ( "someValue<=22" " is incorrect" , name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 149)); else if (result_.debug){ printf("%s (%s line:%d)\n","Pass: """,(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),149); } } catch(...) { result_.addFailure (Failure ("Unhandled exception in CHECK " "someValue<=22" , name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 149)); };
+    try { if (!(check==true)) result_.addFailure (Failure ( "check==true" " is incorrect" , name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 150)); else if (result_.debug){ printf("%s (%s line:%d)\n","Pass: """,(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),150); } } catch(...) { result_.addFailure (Failure ("Unhandled exception in CHECK " "check==true" , name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 150)); };
+    someValue = 1.0000f;
+    try { if (!((someValue==0x10))) result_.addFailure (Failure ( "(someValue==0x10)" " is incorrect" , name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 152)); else if (result_.debug){ printf("%s (%s line:%d)\n","Pass: """,(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),152); } } catch(...) { result_.addFailure (Failure ("Unhandled exception in CHECK " "(someValue==0x10)" , name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 152)); };
+    try { if (!(str=="Hello")) result_.addFailure (Failure ( "str==\"Hello\"" " is incorrect" , name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 153)); else if (result_.debug){ printf("%s (%s line:%d)\n","Pass: """,(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),153); } } catch(...) { result_.addFailure (Failure ("Unhandled exception in CHECK " "str==\"Hello\"" , name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 153)); };
+    { try { double _expected = (someValue); double _actual = (2.0f); if (fabs ((_expected)-(_actual)) > 0.001) { char message [80]; sprintf (message, "expected %lf but was: %lf", (_expected), (_actual)); result_.addFailure (Failure (message, name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 154,"2.0=2.0")); } else { if (result_.debug) printf("%s (%s line:%d) \n","Pass:\t""\"2.0=2.0\"",(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),154); } } catch(...) { result_.addFailure (Failure ("Unhandled exception", name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 154,"2.0=2.0")); }};
+    try { std::string errorMsg; if (CheckEqual(str, "USA",errorMsg)==false){ result_.addFailure (Failure (errorMsg, name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 155)); } else if (result_.debug){ printf("%s (%s line:%d) \n","Pass:\t""",(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),155); } } catch(...) { result_.addFailure (Failure ("Unhandled exception", name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 155)); };
+    try { std::string errorMsg; if (CheckEqual(str, "1",errorMsg)==false){ result_.addFailure (Failure (errorMsg, name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 156,"tiugugu")); } else if (result_.debug){ printf("%s (%s line:%d) \n","Pass:\t""\"tiugugu\"",(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),156); } } catch(...) { result_.addFailure (Failure ("Unhandled exception", name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 156,"tiugugu")); };
+    try { std::string errorMsg; if (CheckEqual(str, "hello",errorMsg)==false){ result_.addFailure (Failure (errorMsg, name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 157)); } else if (result_.debug){ printf("%s (%s line:%d) \n","Pass:\t""",(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),157); } } catch(...) { result_.addFailure (Failure ("Unhandled exception", name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 157)); };
+    { try { std::string _expected(str); std::string _actual("Hello"); if (_expected != _actual) { std::string msg = std::string("expected '") + _expected + std::string("' but was: '") + _actual + "'"; result_.addFailure (Failure (msg.c_str(), name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 158)); } else { if (result_.debug) printf("%s (%s line:%d) \n","Pass:\t""",(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),158); } } catch(...) { result_.addFailure (Failure ("Unhandled exception", name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 158)); }};
+    { try { std::string errorMsg; if ( CheckArrayEqual( one, oned, 2,errorMsg )==false){ result_.addFailure (Failure (errorMsg, name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 159,"hello")); } else { if (result_.debug) printf("%s (%s line:%d) \n","Pass:\t""\"hello\"",(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),159); } } catch (...) { result_.addFailure (Failure ("Unhandled exception", name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 159,"hello")); } };
+    { try { std::string errorMsg; if ( CheckArrayEqual( one, oned, 2,errorMsg )==false){ result_.addFailure (Failure (errorMsg, name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 160,"2")); } else { if (result_.debug) printf("%s (%s line:%d) \n","Pass:\t""\"2\"",(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),160); } } catch (...) { result_.addFailure (Failure ("Unhandled exception", name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 160,"2")); } };
+    { try { std::string errorMsg; if ( CheckArrayEqual( one, oned, 3,errorMsg )==false){ result_.addFailure (Failure (errorMsg, name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 161,"3")); } else { if (result_.debug) printf("%s (%s line:%d) \n","Pass:\t""\"3\"",(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),161); } } catch (...) { result_.addFailure (Failure ("Unhandled exception", name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 161,"3")); } };
+    try { std::string errorMsg; if ( CheckClose(someValue, 13,3,errorMsg)==false ){ result_.addFailure (Failure (errorMsg, name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 162)); } else { if (result_.debug) printf("%s (%s line:%d) \n","Pass:\t""",(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),162); } } catch (...) { result_.addFailure (Failure ("Unhandled exception in CHECK_CLOSE ",name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 162)); };
+    struct TestException {};
+    do { bool caught_ = false; try { throw TestException(); } catch (TestException const&) { caught_ = true; } catch (...) {} if (!caught_) { result_.addFailure (Failure ("Expected exception: \"" "TestException" "\" not thrown", name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 164,"hello")); } else { if (result_.debug) printf("%s (%s line:%d) \n","Pass:\t""\"hello\"",(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),164); } } while(0);
+    { try { long _expected = (num); long _actual = (12); if (_expected != _actual) { char message [80]; sprintf (message, "expected %ld but was: %ld", _expected, _actual); result_.addFailure (Failure (message, name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 165)); } else { if (result_.debug) printf("%s (%s line:%d) \n","Pass:\t""",(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),165); } } catch(...) { result_.addFailure (Failure ("Unhandled exception", name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 165)); }};
 }
 
 class Test2MyFixtureTest : public Test, MyFixtureSetup { public: Test2MyFixtureTest () : Test ("MyFixture" "_Test","MyFixture","Test2" ) {} void setup() {MyFixtureSetup::setup();} void teardown() {MyFixtureSetup::teardown();} void runTest (TestResult& result_); } Test2MyFixtureInstance; void Test2MyFixtureTest::runTest (TestResult& result_)
 {
-        MyTestClass myObject;
-    { try { double _expected = (someValue); double _actual = (2.0f); if (fabs ((_expected)-(_actual)) > 0.001) { char message [80]; sprintf (message, "expected %lf but was: %lf", (_expected), (_actual)); result_.addFailure (Failure (message, name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 57)); } else { printf("%s (%s line:%d) \n","Pass:\t""",(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),57); } } catch(...) { result_.addFailure (Failure ("Unhandled exception", name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 57)); }};
-    { try { std::string _expected(str); std::string _actual(std::string("Hello")); if (_expected != _actual) { std::string msg = std::string("expected '") + _expected + std::string("' but was: '") + _actual + "'"; result_.addFailure (Failure (msg.c_str(), name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 58)); } else { printf("%s (%s line:%d) \n","Pass:\t""",(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),58); } } catch(...) { result_.addFailure (Failure ("Unhandled exception", name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 58)); }};
-        str="SCEA";
-        { try { long _expected = (1); long _actual = (myObject.s_currentInstances); if (_expected != _actual) { char message [80]; sprintf (message, "expected %ld but was: %ld", _expected, _actual); result_.addFailure (Failure (message, name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 60,"CHECK_LONGS_EQUAL (1, myObject.s_currentInstances)")); } else { printf("%s (%s line:%d) \n","Pass:\t""\"CHECK_LONGS_EQUAL (1, myObject.s_currentInstances)\"",(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),60); } } catch(...) { result_.addFailure (Failure ("Unhandled exception", name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 60,"CHECK_LONGS_EQUAL (1, myObject.s_currentInstances)")); }};
-
-
-
+    { try { double _expected = (someValue); double _actual = (2.0f); if (fabs ((_expected)-(_actual)) > 0.001) { char message [80]; sprintf (message, "expected %lf but was: %lf", (_expected), (_actual)); result_.addFailure (Failure (message, name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 170)); } else { if (result_.debug) printf("%s (%s line:%d) \n","Pass:\t""",(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),170); } } catch(...) { result_.addFailure (Failure ("Unhandled exception", name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 170)); }};
+    { try { std::string _expected(str); std::string _actual(std::string("Hello")); if (_expected != _actual) { std::string msg = std::string("expected '") + _expected + std::string("' but was: '") + _actual + "'"; result_.addFailure (Failure (msg.c_str(), name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 171)); } else { if (result_.debug) printf("%s (%s line:%d) \n","Pass:\t""",(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),171); } } catch(...) { result_.addFailure (Failure ("Unhandled exception", name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 171)); }};
+    str="SCEA";
 }
 
 
-class Test3MyFixtureTest : public Test, MyFixtureSetup { public: Test3MyFixtureTest () : Test ("MyFixture" "_Test","MyFixture","Test3" ) {} void setup() {MyFixtureSetup::setup();} void teardown() {MyFixtureSetup::teardown();} void runTest (TestResult& result_); } Test3MyFixtureInstance; void Test3MyFixtureTest::runTest (TestResult& result_)
-{
-        MyTestClass myObject;
-
-
-
-        { try { std::string _expected(str); std::string _actual(std::string("Hello")); if (_expected != _actual) { std::string msg = std::string("expected '") + _expected + std::string("' but was: '") + _actual + "'"; result_.addFailure (Failure (msg.c_str(), name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 73)); } else { printf("%s (%s line:%d) \n","Pass:\t""",(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),73); } } catch(...) { result_.addFailure (Failure ("Unhandled exception", name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 73)); }};
-        printf("current myObject.s_currentInstances %d\n",myObject.s_currentInstances);
-
-    { try { long _expected = (1); long _actual = (myObject.s_currentInstances); if (_expected != _actual) { char message [80]; sprintf (message, "expected %ld but was: %ld", _expected, _actual); result_.addFailure (Failure (message, name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 76,"CHECK_LONGS_EQUAL (1, myObject.s_currentInstances)")); } else { printf("%s (%s line:%d) \n","Pass:\t""\"CHECK_LONGS_EQUAL (1, myObject.s_currentInstances)\"",(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),76); } } catch(...) { result_.addFailure (Failure ("Unhandled exception", name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 76,"CHECK_LONGS_EQUAL (1, myObject.s_currentInstances)")); }};
-    { try { long _expected = (2); long _actual = (myObject.s_instancesCreated); if (_expected != _actual) { char message [80]; sprintf (message, "expected %ld but was: %ld", _expected, _actual); result_.addFailure (Failure (message, name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 77,"CHECK_LONGS_EQUAL (2, myObject.s_instancesCreated)")); } else { printf("%s (%s line:%d) \n","Pass:\t""\"CHECK_LONGS_EQUAL (2, myObject.s_instancesCreated)\"",(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),77); } } catch(...) { result_.addFailure (Failure ("Unhandled exception", name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 77,"CHECK_LONGS_EQUAL (2, myObject.s_instancesCreated)")); }};
-    { try { long _expected = (1); long _actual = (myObject.s_maxSimultaneousInstances); if (_expected != _actual) { char message [80]; sprintf (message, "expected %ld but was: %ld", _expected, _actual); result_.addFailure (Failure (message, name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 78,"CHECK_LONGS_EQUAL (1, myObject.s_maxSimultaneousInstances)")); } else { printf("%s (%s line:%d) \n","Pass:\t""\"CHECK_LONGS_EQUAL (1, myObject.s_maxSimultaneousInstances)\"",(strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"),78); } } catch(...) { result_.addFailure (Failure ("Unhandled exception", name, (strrchr("main.cpp", '\\') ? strrchr("main.cpp", '\\') + 1 : "main.cpp"), 78,"CHECK_LONGS_EQUAL (1, myObject.s_maxSimultaneousInstances)")); }};
-
-}
 
 int main()
 {
     TestResultStdErr result;
-# 97 "main.cpp"
-  TestRegistry::runTestsbySuite(result,"MyFixture");
-  TestRegistry::runTestsbySuite(result,"AAA");
- result.getTotalTestCases();
+
+    TestRegistry::runAllTests(result);
+
+
+
+
+
+    result.getTotalTestCases();
 }

@@ -1,4 +1,3 @@
-/*
 #ifndef TESTRESULTDEBUGOUT_H
 #define TESTRESULTDEBUGOUT_H
 
@@ -16,4 +15,3 @@ public:
 
 #endif
 
-			 */

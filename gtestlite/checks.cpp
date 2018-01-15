@@ -2,7 +2,8 @@
 
 using namespace std;
 
-void CheckStringsEqual(char const* expected, char const* actual,  string &errorMsg ) {
+void CheckStringsEqual(char const* expected, char const* actual,  string &errorMsg ) 
+{
     if ( expected == actual ) {
         return  ;
     }
@@ -20,10 +21,7 @@ void CheckStringsEqual(char const* expected, char const* actual,  string &errorM
     }
 }
 
- 
-
-
-bool CheckEqual(char const* expected, char const* actual,string &errorMsg)
+bool CheckEqual(const char* expected,  const char* actual,string &errorMsg)
 {
  
 	  CheckStringsEqual(expected, actual, errorMsg);

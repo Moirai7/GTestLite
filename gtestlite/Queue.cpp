@@ -10,11 +10,11 @@ public :
 	bool isEmpty();
 	void clear();
 	void enqueue(T value);
-	T dequeue();
-	T peek();
-	void expandCapacity();
+	T* dequeue();
+	T* peek();
 private :
-	static const int INITIAL_CAPACITY = 10;
+	void expandCapacity();
+	static const int INITIAL_CAPACITY = 3;
 	T *data;
 	int capacity;
 	int head;
@@ -63,19 +63,25 @@ void Queue<T> :: enqueue(T value)
 }
 
 template <class T>
-T Queue<T> :: dequeue() 
+T* Queue<T> :: dequeue() 
 {
-	if (isEmpty()) cerr << "dequeue: Attempting to dequeue an empty queue";
-	T result = data[head];
+	if (isEmpty()) {
+		cerr << "dequeue: Attempting to dequeue an empty queue";
+		return NULL;
+	}
+	T* result = &data[head];
 	head = (head + 1) % capacity;
 	return result;
 }
 
 template <class T>
-T Queue<T> :: peek() 
+T* Queue<T> :: peek() 
 {
-	if (isEmpty()) cerr << "peek: Attempting to peek at an empty queue";
-	return data[head];
+	if (isEmpty()) {
+		cerr << "peek: Attempting to peek at an empty queue";
+		return NULL;
+	}
+	return &data[head];
 }
 
 template <class T>

@@ -1,6 +1,7 @@
+#include "gtestlite/MyTest.cpp"
 
-class MYTEST{
-	MYTEST(){
-	}
-	
+int main()
+{
+	MyTest mt;
+        mt.run(10,1000);
 }

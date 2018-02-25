@@ -6,7 +6,7 @@ class MyTest
 public:
 	MyTest();
 	~MyTest();
-	void run(int n, int max);
+	int run(int n, int max);
 };
 
 MyTest::MyTest(){
@@ -15,7 +15,7 @@ MyTest::MyTest(){
 MyTest::~MyTest(){
 }
 
-void MyTest::run(int n, int maxint){
+int MyTest::run(int n, int maxint){
 	int result = 0, i = 0;
 	if (n<0) n = -n;
 	while(i<n && result<=maxint) {
@@ -23,9 +23,8 @@ void MyTest::run(int n, int maxint){
 		result = result+i;
 	}
 	if (result<=maxint) {
-		cout<<result;
+		return result;
 	} else {
-		cout<<"the result is too large!";
+		return -1;
 	}
-	return ;
 }
